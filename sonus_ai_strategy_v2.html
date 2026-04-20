@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonus Events — AI Growth & Operations Engine</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #18181f;
+    --surface3: #1e1e28;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(0,229,255,0.3);
+    --cyan: #00e5ff;
+    --cyan-dim: rgba(0,229,255,0.12);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.1);
+    --amber: #ffb800;
+    --amber-dim: rgba(255,184,0,0.1);
+    --red: #ff4444;
+    --purple: #b57aff;
+    --purple-dim: rgba(181,122,255,0.1);
+    --text: #e8e8f0;
+    --text-muted: #7a7a90;
+    --text-dim: #3a3a50;
+    --font: 'SF Mono','Fira Code',monospace;
+    --sans: -apple-system,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}
+  .site-header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:.6rem}
+  .logo-box{width:26px;height:26px;background:var(--cyan);border-radius:5px;display:flex;align-items:center;justify-content:center}
+  .logo-box svg{width:14px;height:14px}
+  .logo-text{font-size:13px;font-weight:600}
+  .logo-text span{color:var(--cyan)}
+  .badges{display:flex;gap:.4rem}
+  .badge{font-family:var(--font);font-size:10px;padding:.15rem .5rem;border-radius:3px;border:1px solid;font-weight:600;letter-spacing:.06em}
+  .bc{color:var(--cyan);border-color:rgba(0,229,255,.3);background:var(--cyan-dim)}
+  .bg{color:var(--green);border-color:rgba(0,255,136,.25);background:var(--green-dim)}
+  .ba{color:var(--amber);border-color:rgba(255,184,0,.25);background:var(--amber-dim)}
+  .bm{color:var(--text-muted);border-color:var(--border);background:var(--surface2)}
+  .hero{max-width:1200px;margin:0 auto;padding:3rem 2rem 2rem;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-60px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,229,255,.05) 0%,transparent 65%);pointer-events:none}
+  .hero-eye{font-family:var(--font);font-size:10px;color:var(--cyan);letter-spacing:.18em;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+  .hero-eye::before{content:'';display:block;width:20px;height:1px;background:var(--cyan)}
+  .hero h1{font-size:2.5rem;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:.8rem}
+  .hero h1 em{color:var(--cyan);font-style:normal}
+  .hero-sub{font-size:14px;color:var(--text-muted);max-width:540px;line-height:1.7;margin-bottom:1.8rem}
+  .hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap}
+  .stat-val{font-family:var(--font);font-size:24px;font-weight:700;color:var(--cyan)}
+  .stat-label{font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase}
+  .main{max-width:1200px;margin:0 auto;padding:0 2rem 4rem}
+  .sec-head{display:flex;align-items:center;gap:.75rem;margin:2.5rem 0 1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+  .sec-num{font-family:var(--font);font-size:10px;color:var(--text-dim);letter-spacing:.1em;min-width:24px}
+  .sec-head h2{font-size:.9rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+  .sec-head .badge{margin-left:auto}
+  /* grid panels */
+  .panel-grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
+  .g4{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .panel{background:var(--surface);padding:1rem 1.1rem;transition:background .15s}
+  .panel:hover{background:var(--surface2)}
+  .panel-head{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem}
+  .picon{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+  .ic{background:var(--cyan-dim);color:var(--cyan)}
+  .ig{background:var(--green-dim);color:var(--green)}
+  .ia{background:var(--amber-dim);color:var(--amber)}
+  .ip{background:var(--purple-dim);color:var(--purple)}
+  .ir{background:rgba(255,68,68,.1);color:var(--red)}
+  .panel-title{font-size:12px;font-weight:600}
+  .panel-num{font-family:var(--font);font-size:10px;color:var(--cyan);margin-bottom:.2rem}
+  .panel-sub{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:.5rem}
+  .items{list-style:none;padding:0}
+  .items li{font-family:var(--font);font-size:11px;color:var(--text-muted);padding:.18rem 0;border-bottom:1px solid var(--border);display:flex;gap:.4rem;line-height:1.4}
+  .items li:last-child{border-bottom:none}
+  .items li::before{content:'›';color:var(--text-dim);flex-shrink:0}
+  /* system blocks */
+  .sys-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.2rem;transition:border-color .2s}
+  .sys-block:hover{border-color:rgba(0,229,255,.2)}
+  .sys-hd{background:var(--surface2);border-bottom:1px solid var(--border);padding:.9rem 1.2rem;display:flex;align-items:center;gap:.8rem}
+  .sys-n{font-family:var(--font);font-size:10px;color:var(--cyan);letter-spacing:.1em;min-width:72px}
+  .sys-t{font-size:14px;font-weight:700;flex:1}
+  .sys-bd{display:grid;grid-template-columns:1fr 1fr}
+  .sys-col{padding:1rem 1.2rem;border-right:1px solid var(--border)}
+  .sys-col:last-child{border-right:none}
+  .col-title{font-family:var(--font);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.5rem}
+  .tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.7rem}
+  .tag{font-family:var(--font);font-size:10px;padding:.12rem .4rem;border-radius:3px;border:1px solid var(--border);color:var(--text-muted);background:var(--surface3)}
+  .tc{border-color:rgba(0,229,255,.28);color:var(--cyan);background:var(--cyan-dim)}
+  .tg{border-color:rgba(0,255,136,.22);color:var(--green);background:var(--green-dim)}
+  .ta{border-color:rgba(255,184,0,.22);color:var(--amber);background:var(--amber-dim)}
+  .tp{border-color:rgba(181,122,255,.22);color:var(--purple);background:var(--purple-dim)}
+  .steps{list-style:none;padding:0}
+  .steps li{display:flex;gap:.55rem;padding:.35rem 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5;align-items:baseline}
+  .steps li:last-child{border-bottom:none}
+  .sn{font-family:var(--font);font-size:9px;color:var(--cyan);background:var(--cyan-dim);border:1px solid rgba(0,229,255,.2);width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+  .kpis{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+  .kpi{font-family:var(--font);font-size:10px;color:var(--green);background:var(--green-dim);border:1px solid rgba(0,255,136,.18);padding:.15rem .45rem;border-radius:3px}
+  .checks{list-style:none;padding:0}
+  .checks li{font-size:12px;color:var(--text-muted);padding:.22rem 0;display:flex;gap:.45rem;border-bottom:1px solid var(--border)}
+  .checks li:last-child{border-bottom:none}
+  .checks li::before{content:'✓';color:var(--amber);font-size:10px}
+  /* role type badge */
+  .rtb{font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:.1em;padding:.12rem .38rem;border-radius:3px;border:1px solid;text-transform:uppercase;flex-shrink:0}
+  .rai{color:var(--cyan);border-color:rgba(0,229,255,.3);background:var(--cyan-dim)}
+  .rhu{color:var(--purple);border-color:rgba(181,122,255,.3);background:var(--purple-dim)}
+  .rhy{color:var(--amber);border-color:rgba(255,184,0,.3);background:var(--amber-dim)}
+  .role-name{font-size:12px;font-weight:600}
+  .role-sub{font-size:11px;color:var(--text-dim)}
+  .rsec{font-family:var(--font);font-size:9px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;margin:.55rem 0 .25rem}
+  /* roadmap */
+  .phase-hd{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+  .phase-lbl{font-family:var(--font);font-size:9px;letter-spacing:.14em;margin-bottom:.2rem}
+  .p1c{color:var(--cyan)} .p2c{color:var(--green)} .p3c{color:var(--purple)}
+  .phase-t{font-size:12px;font-weight:700;margin-bottom:.15rem}
+  .phase-p{font-size:11px;color:var(--text-dim)}
+  .phase-bd{padding:.7rem 1.1rem}
+  .pi{padding:.55rem 0;border-bottom:1px solid var(--border)}
+  .pi:last-child{border-bottom:none}
+  .pi-t{font-size:12px;font-weight:600;margin-bottom:.12rem}
+  .pi-o{font-size:10px;color:var(--text-dim);margin-bottom:.2rem}
+  .pi-m{font-family:var(--font);font-size:10px;color:var(--green);background:var(--green-dim);border:1px solid rgba(0,255,136,.15);display:inline-block;padding:.08rem .38rem;border-radius:3px}
+  /* bottlenecks */
+  .bn{background:var(--surface);padding:.9rem 1rem;border-top:2px solid var(--red);transition:background .15s}
+  .bn:hover{background:var(--surface2)}
+  .bn.am{border-top-color:var(--amber)}
+  .bn-t{font-size:12px;font-weight:700;margin-bottom:.35rem}
+  .bn-p{font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:.4rem}
+  .bn-f{font-family:var(--font);font-size:10px;color:var(--cyan)}
+  /* posture */
+  .posture-t{font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:.6rem}
+  /* cta */
+  .cta{background:var(--surface);border:1px solid var(--border-bright);border-radius:8px;padding:1.4rem;margin-top:1.5rem}
+  .cta-lbl{font-family:var(--font);font-size:9px;letter-spacing:.15em;color:var(--cyan);text-transform:uppercase;margin-bottom:.5rem}
+  .cta p{font-size:13px;color:var(--text);line-height:1.65;margin-bottom:.5rem}
+  .cta code{font-family:var(--font);font-size:10px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.4rem .7rem;display:block;margin-top:.4rem}
+  footer{border-top:1px solid var(--border);padding:1.1rem 2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;max-width:1200px;margin:0 auto}
+  footer span{font-family:var(--font);font-size:10px;color:var(--text-dim)}
+  @media(max-width:768px){.g2,.g3,.sys-bd{grid-template-columns:1fr}.hero h1{font-size:1.8rem}.sys-col{border-right:none;border-bottom:1px solid var(--border)}.sys-col:last-child{border-bottom:none}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-box">
+      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="2.5" height="7" rx=".5" fill="#0a0a0c"/><rect x="5.5" y="1" width="2.5" height="11" rx=".5" fill="#0a0a0c"/><rect x="10" y="4" width="2.5" height="8" rx=".5" fill="#0a0a0c"/></svg>
+    </div>
+    <span class="logo-text"><span>Sonus</span> Events</span>
+  </div>
+  <div class="badges">
+    <span class="badge bc">STRATEGY</span>
+    <span class="badge bg">v1.0</span>
+    <span class="badge bm">Claude · N8N · Clay</span>
+    <span class="badge ba">CONFIDENTIAL</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eye">AI GROWTH &amp; OPERATIONS ENGINE</div>
+  <h1>The <em>AI-First</em><br>Sonus Stack</h1>
+  <p class="hero-sub">A full-system blueprint — from raw ideas to executable outbound, SEO, proposal, content, and ops infrastructure. Built to make Sonus the most technically advanced AV company in Scotland.</p>
+  <div class="hero-stats">
+    <div><div class="stat-val">12</div><div class="stat-label">Themes Identified</div></div>
+    <div><div class="stat-val">8</div><div class="stat-label">Systems Designed</div></div>
+    <div><div class="stat-val">10</div><div class="stat-label">Roles Mapped</div></div>
+    <div><div class="stat-val">90</div><div class="stat-label">Day Roadmap</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- 01 EXEC -->
+<div class="sec-head"><span class="sec-num">01</span><h2>Executive Summary</h2><span class="badge bc">10 KEY TRUTHS</span></div>
+<div class="panel-grid g2">
+  <div class="panel"><div class="panel-num">01 // VISION</div><div class="panel-title" style="margin-bottom:.3rem">Lean and lethal</div><div class="panel-sub">5–7 humans + always-on AI layer handling 80% of grunt work: outreach, content, quoting, SEO, scheduling, and lead qualification. Achievable now.</div></div>
+  <div class="panel"><div class="panel-num">02 // PRIORITY</div><div class="panel-title" style="margin-bottom:.3rem">Sales is the biggest bleeding wound</div><div class="panel-sub">Lauren, Gill, a manual pipeline. No scalable outbound, no content engine, no automated follow-up. A sales infrastructure problem — not a product problem.</div></div>
+  <div class="panel"><div class="panel-num">03 // CORE STACK</div><div class="panel-title" style="margin-bottom:.3rem">N8N is your nervous system</div><div class="panel-sub">Every system connects through N8N on Contabo VPS. Priority: Clay → verification → GHL → outreach → reply handling → booking.</div></div>
+  <div class="panel"><div class="panel-num">04 // INTELLIGENCE</div><div class="panel-title" style="margin-bottom:.3rem">Clay + Claude Code = your BDE</div><div class="panel-sub">Clay enriches; Claude Code personalises — angle generation, proposal drafts, reply analysis. Together they replace a £40k/yr BDE for outbound.</div></div>
+  <div class="panel"><div class="panel-num">05 // CONTENT</div><div class="panel-title" style="margin-bottom:.3rem">Content is a compounding asset</div><div class="panel-sub">Apify scraping + AEO-optimised SEO targeting AI search engines. Inbound leads within 60–90 days is realistic with consistent output.</div></div>
+  <div class="panel"><div class="panel-num">06 // MOAT</div><div class="panel-title" style="margin-bottom:.3rem">3D visualisation is your competitive moat</div><div class="panel-sub">LiDAR → Polycam → OpenArt → UE5 renders in proposals. Almost no UK AV company doing this. Shortens sales cycles and wins high-value bids.</div></div>
+  <div class="panel"><div class="panel-num">07 // INFRA</div><div class="panel-title" style="margin-bottom:.3rem">Stack is already 70% there</div><div class="panel-sub">GHL, N8N, Clay, HeyReach, Current RMS all exist. Gap = automation logic, trained prompts, and consistent workflows connecting them.</div></div>
+  <div class="panel"><div class="panel-num">08 // SEO</div><div class="panel-title" style="margin-bottom:.3rem">AEO is the 2025–2026 SEO play</div><div class="panel-sub">Structure content so Perplexity, ChatGPT Search, and Google AI Overviews cite you. 14 landing pages are the foundation. Add FAQ schema now.</div></div>
+  <div class="panel"><div class="panel-num">09 // TALENT</div><div class="panel-title" style="margin-bottom:.3rem">Prostage arms are strategic assets</div><div class="panel-sub">Academy and Crew with AI-assisted CV screening, interview pre-qual, and SOP onboarding — 80% of recruitment pipeline before a human touches it.</div></div>
+  <div class="panel"><div class="panel-num">10 // FIRST 30 DAYS</div><div class="panel-title" style="margin-bottom:.3rem">Plumbing not polish</div><div class="panel-sub">Not the website. Not the rebrand. Start: outbound in Clay + HeyReach, N8N lead-to-CRM workflow, proposal template in Claude + Current RMS.</div></div>
+</div>
+
+<!-- 02 THEMES -->
+<div class="sec-head"><span class="sec-num">02</span><h2>Structured Outline — 12 Themes</h2><span class="badge bm">ALL IDEAS CAPTURED</span></div>
+<div class="panel-grid g4">
+  <div class="panel"><div class="panel-head"><div class="picon ic">⚡</div><div class="panel-title">AI Outbound Engine</div></div><ul class="items"><li>Clay for lead sourcing + enrichment</li><li>Sales Navigator ICP targeting</li><li>IcyPeas / Hunter / Apollo</li><li>Million Verifier validation</li><li>Instantly / Hypergen / QuickMail</li><li>HeyReach LinkedIn automation</li><li>AI-personalised, no automation signals</li><li>Multi-SDR setup (never sleeps)</li><li>GHL pipeline + CRM</li><li>GTM Specialist role</li><li>Goal = relationships not just closes</li><li>George Trajkovski (Instantly)</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ig">◉</div><div class="panel-title">SEO / AEO Stack</div></div><ul class="items"><li>Perplexity + Claude → SEO stack</li><li>Google Search Console</li><li>Google Analytics</li><li>Ahrefs audits + tracking</li><li>All fixes in one N8N workflow</li><li>Anti-gravity SEO strategy</li><li>PR releases → backlink builder</li><li>SEO PR on AEO</li><li>14 landing pages built</li><li>Research → summary → action steps</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ia">▶</div><div class="panel-title">Content &amp; Social</div></div><ul class="items"><li>TikTok: tutorials, BTS, challenges</li><li>LinkedIn active presence</li><li>Apify: scrape high-engagement content</li><li>Script + storyboard generation</li><li>Canva + OpenAI for graphics</li><li>Social Planner integration</li><li>Trending sounds + hashtags</li><li>Deep research → copy → graphics</li><li>Self-evaluating content model</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ip">◈</div><div class="panel-title">3D Event Design</div></div><ul class="items"><li>Capture / Vectorworks</li><li>OpenArt + Unreal Engine 5</li><li>iPhone LiDAR → Polycam pipeline</li><li>Banana Graphics 3D visuals</li><li>AI export super-realistic renders</li><li>Renders in proposals</li><li>AI design then export</li><li>Resolume VJ integration</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ic">⚙</div><div class="panel-title">Infrastructure Stack</div></div><ul class="items"><li>Unraid server (Jacko)</li><li>N8N on Contabo VPS</li><li>Cloudflare domains + deliverability</li><li>Coolify self-hosted apps</li><li>Vercel + GitHub (Claude Code)</li><li>Ollama + Open WebUI</li><li>OpenRouter multi-model</li><li>Mac Mini AI workstation</li><li>Replace Krystal / Dropbox</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ia">£</div><div class="panel-title">Proposal Builder</div></div><ul class="items"><li>Current RMS base pricing</li><li>Improve accuracy of quotes</li><li>Margins 60%/55% thresholds</li><li>Claude + OpenAI + OpenArt</li><li>Technical Coordinator for quoting</li><li>Brief → equipment + cost</li><li>Contract generation</li><li>Copywriting in proposals</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ig">◐</div><div class="panel-title">Team &amp; AI Employees</div></div><ul class="items"><li>Current: Alan, Lauren, Gill, Owen, Justin</li><li>Needed: Senior Tech, BDE, PM, RevOps</li><li>AI Team: Filip, Tim, Luka, Bo, Emre</li><li>80% grunt work by AI</li><li>Lean staff, paid more, work less</li><li>AI as employee (Mac Mini + Claude)</li><li>Experts: Feldman, Ottley, Herk</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ip">🎓</div><div class="panel-title">Recruitment &amp; Training</div></div><ul class="items"><li>CV assessment by AI</li><li>Initial Zoom interview by AI</li><li>Prostage Academy (training)</li><li>Prostage Crew (staffing)</li><li>Freelance scraping by location</li><li>Train models on events + production</li><li>Share trained tools with staff</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ir">⟳</div><div class="panel-title">Automation &amp; Workflows</div></div><ul class="items"><li>N8N full ops + process manager</li><li>Sales and booking workflows</li><li>Feedback automation</li><li>Follow-up sequences</li><li>Email management + todo lists</li><li>H&amp;S documents and systems</li><li>Lead → CRM → campaign</li><li>Voice AI assistant (Jarvis)</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ic">◎</div><div class="panel-title">AI Models</div></div><ul class="items"><li>Claude / Claude Code (core)</li><li>Claude Co-Work (team)</li><li>Perplexity (research)</li><li>OpenAI GPT (proposals, copy)</li><li>Grok (social + real-time)</li><li>Gemini (multimodal)</li><li>OpenRouter (routing)</li><li>Multi-model orchestration</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ia">⬡</div><div class="panel-title">Web &amp; Brand</div></div><ul class="items"><li>Sonus website redesign</li><li>Lovable / Bolt / Plexto</li><li>Claude Code custom tools</li><li>AI Taste + UX/UI Pro Max</li><li>Don't use Inter font</li><li>Ultra-modern direction</li><li>14 SEO landing pages</li><li>Rank Math configured</li></ul></div>
+  <div class="panel"><div class="panel-head"><div class="picon ig">↗</div><div class="panel-title">Business Intelligence</div></div><ul class="items"><li>Prostage Academy revenue stream</li><li>Prostage Crew revenue stream</li><li>AI-assisted brainstorming</li><li>Current RMS pipeline</li><li>Invoice financing / cashflow</li><li>Xero integration</li><li>Attribution — what works</li><li>Event pricing accuracy</li></ul></div>
+</div>
+
+<!-- 04 SYSTEMS -->
+<div class="sec-head"><span class="sec-num">04</span><h2>System Blueprints</h2><span class="badge bc">8 SYSTEMS</span></div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 01</span><span class="sys-t">AI Outbound Engine</span><span class="badge bc">PRIORITY #1</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">INPUTS &amp; STACK</div>
+      <div class="tags"><span class="tag tc">Clay</span><span class="tag tc">Claude Code</span><span class="tag tc">Perplexity</span><span class="tag">Sales Nav</span><span class="tag">IcyPeas</span><span class="tag">Million Verifier</span><span class="tag ta">HeyReach</span><span class="tag ta">Instantly</span><span class="tag tg">N8N</span><span class="tag tg">GHL</span></div>
+      <div class="col-title">HUMAN CHECKPOINTS</div>
+      <ul class="checks"><li>Alan/Lauren approves ICP criteria monthly</li><li>Lauren reviews copy weekly (first 4 weeks)</li><li>Gill handles all "interested" replies manually</li><li>Monthly performance review meeting</li></ul>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">≥40% open rate</span><span class="kpi">≥5% reply rate</span><span class="kpi">≥8 meetings/month</span><span class="kpi">≤£200 cost/meeting</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Sales Nav / Apollo exports 200–500 ICP contacts per week per segment</li>
+        <li><span class="sn">2</span>Clay enriches: company size, LinkedIn activity, email, tech stack, job role</li>
+        <li><span class="sn">3</span>Million Verifier validates all emails; invalid leads removed from sequence</li>
+        <li><span class="sn">4</span>Claude Code generates personalised opening line from enrichment + event triggers</li>
+        <li><span class="sn">5</span>N8N pushes to Instantly (email) + HeyReach (LinkedIn) per sequencing rules</li>
+        <li><span class="sn">6</span>Sending across 5 warm domains; randomised delays; zero automation signals</li>
+        <li><span class="sn">7</span>Replies classified by Claude: interested / not now / negative / referral</li>
+        <li><span class="sn">8</span>"Interested" → GHL pipeline → Gill notified for human follow-up call</li>
+        <li><span class="sn">9</span>Booked meeting → Lauren briefed; proposal system triggered automatically</li>
+        <li><span class="sn">10</span>Weekly N8N report: sends / opens / replies / meetings / pipeline £ value</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 02</span><span class="sys-t">SEO / AEO Content System</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag tc">Claude</span><span class="tag tc">Perplexity</span><span class="tag">GSC API</span><span class="tag">Ahrefs API</span><span class="tag ta">Apify</span><span class="tag tg">N8N</span><span class="tag">Rank Math</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">Top 3 for 10 KWs (90d)</span><span class="kpi">1 AI citation/month</span><span class="kpi">3 DA50+ backlinks/qtr</span><span class="kpi">+20% organic (90d)</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>N8N triggers every Monday 7am: pulls GSC last 7 days data</li>
+        <li><span class="sn">2</span>Ahrefs API: position changes + competitor new pages identified</li>
+        <li><span class="sn">3</span>Claude finds pages at positions 5–20 with high impression volume</li>
+        <li><span class="sn">4</span>Perplexity researches top-ranking pages for priority keywords</li>
+        <li><span class="sn">5</span>Claude generates prioritised action list: title fixes, expansions, new pages</li>
+        <li><span class="sn">6</span>New content: Claude writes full draft with AEO FAQ schema blocks</li>
+        <li><span class="sn">7</span>N8N sends Slack report to Alan with opportunities + drafted content</li>
+        <li><span class="sn">8</span>Approved → WordPress via REST API; Rank Math meta auto-set</li>
+        <li><span class="sn">9</span>Monthly: Apify scrapes top 5 AV competitors; content gaps surfaced</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 03</span><span class="sys-t">Content Machine</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag tc">Claude</span><span class="tag tc">DALL·E</span><span class="tag">Canva API</span><span class="tag ta">Apify</span><span class="tag">Social Planner</span><span class="tag tg">N8N</span><span class="tag">Descript</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">4 posts/week</span><span class="kpi">LinkedIn +50% impressions (60d)</span><span class="kpi">1 inbound/month from content</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Event marked complete in GHL → N8N workflow triggered automatically</li>
+        <li><span class="sn">2</span>Claude reads event brief: type, venue, client, kit list, outcome</li>
+        <li><span class="sn">3</span>Output: 3 LinkedIn posts, 2 TikTok scripts, 1 email section, 1 case study outline</li>
+        <li><span class="sn">4</span>DALL·E generates 2 graphics per post; Canva template applied</li>
+        <li><span class="sn">5</span>Full package sent to Lauren in Slack for 1-click approval</li>
+        <li><span class="sn">6</span>Approved → scheduled in Social Planner (Tue–Thu, optimal times)</li>
+        <li><span class="sn">7</span>Monthly: Apify competitor pull → Claude generates better versions</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 04</span><span class="sys-t">AI Proposal &amp; Quote Builder</span><span class="badge ba">PRIORITY #2</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag tc">Claude</span><span class="tag tc">OpenAI</span><span class="tag tp">OpenArt / Midjourney</span><span class="tag">Current RMS API</span><span class="tag ta">Margin Calculator</span><span class="tag tg">N8N</span><span class="tag">WeasyPrint PDF</span></div>
+      <div class="col-title">HUMAN CHECKPOINTS</div>
+      <ul class="checks"><li>Lauren reviews narrative + pricing before send</li><li>Technical Coordinator checks kit list accuracy</li><li>Alan signs off any proposal over £20k</li></ul>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">30 min turnaround</span><span class="kpi">Win rate ≥35%</span><span class="kpi">Zero margin errors</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Lauren completes brief form in GHL: event type, venue, dates, headcount, AV needs</li>
+        <li><span class="sn">2</span>N8N triggers Claude: reads brief, generates recommended kit list for event type</li>
+        <li><span class="sn">3</span>Current RMS API: live pricing for all kit; margin check at 60%/55% thresholds</li>
+        <li><span class="sn">4</span>Claude writes proposal narrative: brief restatement, approach, technical rationale, timeline</li>
+        <li><span class="sn">5</span>If venue scan: Polycam mesh → OpenArt generates 2 photorealistic renders</li>
+        <li><span class="sn">6</span>If no scan: DALL·E generates concept mood board visuals</li>
+        <li><span class="sn">7</span>N8N assembles all components → WeasyPrint generates branded PDF</li>
+        <li><span class="sn">8</span>PDF to Lauren in Slack within 30 minutes of brief submission</li>
+        <li><span class="sn">9</span>Approved → client; GHL deal updated to "Proposal Sent"</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 05</span><span class="sys-t">3D Event Visualisation Pipeline</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag">iPhone Pro LiDAR</span><span class="tag ta">Polycam</span><span class="tag tp">OpenArt / ComfyUI</span><span class="tag tp">Unreal Engine 5</span><span class="tag">Vectorworks</span><span class="tag tc">Claude</span><span class="tag tc">Midjourney</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">Render per ≥£10k proposal</span><span class="kpi">Win rate delta: visual vs not</span><span class="kpi">3 renders/week capacity</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Site visit: iPhone Pro LiDAR scans venue with Polycam (15–30 mins)</li>
+        <li><span class="sn">2</span>Polycam exports .OBJ / .USD mesh → uploaded to Unraid storage</li>
+        <li><span class="sn">3</span>Claude translates brief into design spec: stage dims, LED wall size, fixture zones</li>
+        <li><span class="sn">4</span>Vectorworks: structural placement of rigging, LED walls, speaker arrays</li>
+        <li><span class="sn">5</span>OpenArt / UE5 Lumen: generate 3–5 photoreal renders of key angles</li>
+        <li><span class="sn">6</span>Midjourney: alternative aesthetic mood boards for client review</li>
+        <li><span class="sn">7</span>Renders inserted into Proposal Builder (System 04)</li>
+        <li><span class="sn">8</span>Optional: UE5 real-time walkthrough → MP4 for high-value proposals</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 06</span><span class="sys-t">Recruitment &amp; Staffing Assistant</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag tc">Claude (CV scoring)</span><span class="tag tg">GHL (ATS)</span><span class="tag ta">Apify</span><span class="tag tg">N8N</span><span class="tag">Calendly</span><span class="tag">Zoom AI</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">Shortlist in &lt;48hrs</span><span class="kpi">Human time &lt;4hrs/hire</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Application → GHL pipeline; Claude scores CV against criteria (0–100)</li>
+        <li><span class="sn">2</span>&lt;70%: automated polite rejection sent immediately</li>
+        <li><span class="sn">3</span>70–85%: invited to submit 90-second video introduction</li>
+        <li><span class="sn">4</span>85%+: AI Zoom pre-screen scheduled; Claude runs structured questions</li>
+        <li><span class="sn">5</span>Interview transcribed; Claude generates summary + recommendation for Alan</li>
+        <li><span class="sn">6</span>Top 3 shortlisted for Alan's human final interview</li>
+        <li><span class="sn">7</span>Hired → N8N triggers onboarding SOP + Prostage Academy course assignment</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 07</span><span class="sys-t">Knowledge Base &amp; SOP Generator</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag tc">Claude</span><span class="tag">Notion</span><span class="tag tg">N8N</span><span class="tag ta">Ollama (local LLM)</span><span class="tag">OpenWebUI</span><span class="tag">Unraid</span><span class="tag">Whisper API</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">50 SOPs (90d)</span><span class="kpi">Staff using KB weekly</span><span class="kpi">H&amp;S suite complete</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>Alan records voice memo or rough notes on any process</li>
+        <li><span class="sn">2</span>N8N: Whisper API transcribes → Claude generates full SOP from template</li>
+        <li><span class="sn">3</span>SOP published to Notion; tagged by category (sales, production, H&amp;S)</li>
+        <li><span class="sn">4</span>OpenWebUI chatbot trained on KB — all staff can query it directly</li>
+        <li><span class="sn">5</span>Quarterly: Claude audits all SOPs; flags outdated sections to Alan</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="sys-block">
+  <div class="sys-hd"><span class="sys-n">SYS // 08</span><span class="sys-t">Business Intelligence Dashboard</span></div>
+  <div class="sys-bd">
+    <div class="sys-col">
+      <div class="col-title">STACK</div>
+      <div class="tags"><span class="tag">GHL</span><span class="tag">Current RMS</span><span class="tag">Xero</span><span class="tag tc">Claude</span><span class="tag tg">N8N</span><span class="tag">GSC + Ahrefs</span><span class="tag">Airtable</span></div>
+      <div class="col-title">KPIs</div>
+      <div class="kpis"><span class="kpi">Weekly report 100%</span><span class="kpi">Full pipeline visibility</span><span class="kpi">Attribution live (60d)</span></div>
+    </div>
+    <div class="sys-col">
+      <div class="col-title">WORKFLOW</div>
+      <ol class="steps">
+        <li><span class="sn">1</span>N8N Mon 8am: pulls GHL pipeline, Current RMS revenue, Xero cashflow, GSC, outbound</li>
+        <li><span class="sn">2</span>Claude generates 5-bullet summary: what's working, what isn't, biggest opportunity</li>
+        <li><span class="sn">3</span>Slack message to Alan: key numbers + Claude's narrative analysis</li>
+        <li><span class="sn">4</span>Full dashboard updated in Airtable for deep dives</li>
+        <li><span class="sn">5</span>Monthly: Claude runs attribution — which channels generate actual booked revenue</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- 05 TEAM -->
+<div class="sec-head"><span class="sec-num">05</span><h2>Team &amp; Roles Plan</h2><span class="badge bm">HUMANS + AI AGENTS</span></div>
+<div class="panel-grid g4">
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rai">AI Agent</span><div><div class="role-name">Outbound Sales Agent</div><div class="role-sub">Clay · Claude Code · HeyReach · Instantly</div></div></div>
+    <div class="rsec">OWNS</div><ul class="items"><li>ICP prospecting + enrichment</li><li>Email + LinkedIn personalisation</li><li>Sequence management</li><li>Reply classification + routing</li><li>Weekly outbound report</li></ul>
+    <div class="rsec">DOES NOT TOUCH</div><ul class="items"><li>Interested reply handling</li><li>Pricing negotiations</li><li>Client relationship calls</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rai">AI Agent</span><div><div class="role-name">SEO &amp; Content Agent</div><div class="role-sub">Claude · Perplexity · N8N · GSC · Ahrefs</div></div></div>
+    <div class="rsec">OWNS</div><ul class="items"><li>Weekly GSC/Ahrefs analysis</li><li>Content brief generation</li><li>AEO article drafting</li><li>Competitor content scraping</li><li>Social post scheduling</li></ul>
+    <div class="rsec">DOES NOT TOUCH</div><ul class="items"><li>Publishing decisions</li><li>Brand voice sign-off</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rai">AI Agent</span><div><div class="role-name">Proposal Assembly Agent</div><div class="role-sub">Claude · Current RMS · OpenArt</div></div></div>
+    <div class="rsec">OWNS</div><ul class="items"><li>Kit list from brief</li><li>Pricing pull + margin check</li><li>Proposal narrative writing</li><li>Render integration</li><li>PDF assembly + delivery</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rai">AI Agent</span><div><div class="role-name">BI Agent</div><div class="role-sub">N8N · Claude · GHL · Xero · Current RMS</div></div></div>
+    <div class="rsec">OWNS</div><ul class="items"><li>Weekly dashboard report</li><li>Pipeline health monitoring</li><li>Revenue vs target tracking</li><li>Attribution analysis</li><li>Anomaly alerts</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rhu">Human</span><div><div class="role-name">Alan — MD / AI Architect</div><div class="role-sub">Current + expanded</div></div></div>
+    <div class="rsec">SHIFTS TO</div><ul class="items"><li>Designing systems not doing</li><li>Reading dashboards not firefighting</li><li>Approving proposals not writing</li><li>Training AI + staff not managing</li></ul>
+    <div class="rsec">WEEKLY ROUTINE</div><ul class="items"><li>Mon: BI report review (15 mins)</li><li>Tue: AI system QA (1hr)</li><li>Thu: Pipeline review with Lauren</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rhy">Hybrid</span><div><div class="role-name">Lauren — Event Director + AI Supervisor</div></div></div>
+    <div class="rsec">SUPERVISES</div><ul class="items"><li>Proposal Agent (approves before send)</li><li>Content Agent (approves posts)</li><li>Outbound messaging spot checks</li></ul>
+    <div class="rsec">OWNS</div><ul class="items"><li>Client discovery calls</li><li>Brief intake (triggers AI)</li><li>Key relationship management</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rhy">Hybrid</span><div><div class="role-name">Gill — Sales + Outbound Supervisor</div></div></div>
+    <div class="rsec">SUPERVISES</div><ul class="items"><li>All "interested" AI outbound replies</li><li>Follow-up call scheduling</li><li>Pipeline warm management</li></ul>
+    <div class="rsec">OWNS</div><ul class="items"><li>All phone-based relationship building</li><li>Meeting handoff to Lauren</li></ul>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><span class="rtb rhu">Human</span><div><div class="role-name">Senior Technician (to hire)</div><div class="role-sub">Priority Q1</div></div></div>
+    <div class="rsec">OWNS</div><ul class="items"><li>On-site technical leadership</li><li>Complex setups: audio, LED, lighting</li><li>Oversight of Owen + Justin</li><li>Equipment standards + maintenance</li></ul>
+  </div>
+</div>
+
+<!-- 06 ROADMAP -->
+<div class="sec-head"><span class="sec-num">06</span><h2>90-Day Roadmap</h2><span class="badge bm">3 PHASES</span></div>
+<div class="panel-grid g3">
+  <div class="panel" style="padding:0">
+    <div class="phase-hd"><div class="phase-lbl p1c">PHASE 01 · WEEKS 1–4</div><div class="phase-t">Plumbing &amp; Revenue Infrastructure</div><div class="phase-p">Everything must run before anything scales</div></div>
+    <div class="phase-bd">
+      <div class="pi"><div class="pi-t">Domain Infrastructure</div><div class="pi-o">Alan + Oleg · Cloudflare + Instantly</div><div class="pi-m">5 domains live + warm</div></div>
+      <div class="pi"><div class="pi-t">Clay ICP Table: Venues</div><div class="pi-o">Oleg · Clay + Sales Nav + Verifier</div><div class="pi-m">500 verified contacts</div></div>
+      <div class="pi"><div class="pi-t">First Outbound Sequence Live</div><div class="pi-o">Oleg + Lauren · Instantly + HeyReach</div><div class="pi-m">First 100 sends week 3</div></div>
+      <div class="pi"><div class="pi-t">Proposal Template V1</div><div class="pi-o">Alan + Claude Code · Current RMS</div><div class="pi-m">First AI proposal sent</div></div>
+      <div class="pi"><div class="pi-t">GHL Pipeline Audit</div><div class="pi-o">Gill + Oleg · GHL</div><div class="pi-m">Pipeline live and clean</div></div>
+      <div class="pi"><div class="pi-t">N8N Core Workflows</div><div class="pi-o">Oleg · N8N + Contabo VPS</div><div class="pi-m">3 core workflows live</div></div>
+    </div>
+  </div>
+  <div class="panel" style="padding:0;border-left:1px solid var(--border)">
+    <div class="phase-hd"><div class="phase-lbl p2c">PHASE 02 · WEEKS 5–8</div><div class="phase-t">Scale Outbound &amp; Content Engine</div><div class="phase-p">First results in — optimise and expand</div></div>
+    <div class="phase-bd">
+      <div class="pi"><div class="pi-t">Expand to All 4 ICPs</div><div class="pi-o">Oleg · Clay + Instantly + HeyReach</div><div class="pi-m">4 active ICP sequences</div></div>
+      <div class="pi"><div class="pi-t">Content Machine V1</div><div class="pi-o">Lauren + AI Agent · Claude + N8N</div><div class="pi-m">4 posts/week consistent</div></div>
+      <div class="pi"><div class="pi-t">SEO Weekly Automation</div><div class="pi-o">Oleg + Alan · N8N + GSC + Ahrefs</div><div class="pi-m">Monday report live</div></div>
+      <div class="pi"><div class="pi-t">3D Visualisation Test</div><div class="pi-o">Alan · Polycam + OpenArt + UE5</div><div class="pi-m">First render in proposal</div></div>
+      <div class="pi"><div class="pi-t">Senior Technician Hired</div><div class="pi-o">Alan · AI Recruitment System</div><div class="pi-m">Hire confirmed week 8</div></div>
+      <div class="pi"><div class="pi-t">Knowledge Base V1</div><div class="pi-o">Alan + Claude · Notion + OpenWebUI</div><div class="pi-m">20 SOPs + chatbot live</div></div>
+    </div>
+  </div>
+  <div class="panel" style="padding:0;border-left:1px solid var(--border)">
+    <div class="phase-hd"><div class="phase-lbl p3c">PHASE 03 · WEEKS 9–12</div><div class="phase-t">Intelligence Layer &amp; Scale</div><div class="phase-p">Systems self-improving — Alan managing not doing</div></div>
+    <div class="phase-bd">
+      <div class="pi"><div class="pi-t">Full BI Dashboard Live</div><div class="pi-o">Oleg + Alan · N8N + Claude</div><div class="pi-m">Full attribution live</div></div>
+      <div class="pi"><div class="pi-t">Proposal Builder V2 (3D)</div><div class="pi-o">Alan + Oleg · System 04 + 05</div><div class="pi-m">All proposals use system</div></div>
+      <div class="pi"><div class="pi-t">Outbound Optimisation</div><div class="pi-o">Oleg + Claude · Instantly + GHL</div><div class="pi-m">≥5% reply rate achieved</div></div>
+      <div class="pi"><div class="pi-t">Website Redesign Launch</div><div class="pi-o">Alan + Claude Code · Vercel</div><div class="pi-m">New site live on stack</div></div>
+      <div class="pi"><div class="pi-t">Prostage Academy AI Curriculum</div><div class="pi-o">Alan + Claude · KB + LMS</div><div class="pi-m">First cohort onboarded</div></div>
+      <div class="pi"><div class="pi-t">Commonwealth Games Proposal</div><div class="pi-o">Lauren + Alan · All systems</div><div class="pi-m">Full proposal submitted</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 BOTTLENECKS -->
+<div class="sec-head"><span class="sec-num">07</span><h2>Bottlenecks to Attack First</h2><span class="badge ba">6 CRITICAL</span></div>
+<div class="panel-grid g4">
+  <div class="bn"><div class="bn-t">Sales — No Scalable Outbound</div><div class="bn-p">Reactive pipeline only. No proactive machine generating new conversations.</div><div class="bn-f">→ System 01 · Week 1 priority</div></div>
+  <div class="bn am"><div class="bn-t">Quoting — Too Slow, Too Manual</div><div class="bn-p">Every proposal = 3–4hrs of Lauren's time. Bottleneck to sales velocity.</div><div class="bn-f">→ System 04 · Weeks 2–3</div></div>
+  <div class="bn"><div class="bn-t">Marketing — No Content Output</div><div class="bn-p">LinkedIn, TikTok, blog underutilised. No rhythm. Competitors building audiences.</div><div class="bn-f">→ System 03 · Week 5</div></div>
+  <div class="bn am"><div class="bn-t">Customer Service — Reactive Comms</div><div class="bn-p">No automated check-ins, pre-event briefings, or post-event feedback.</div><div class="bn-f">→ N8N GHL post-sale workflow · Week 4</div></div>
+  <div class="bn"><div class="bn-t">Design — No Visual Proposals</div><div class="bn-p">Proposals lack visual impact. Competitors with renders winning on presentation alone.</div><div class="bn-f">→ System 05 + 04 · Week 6</div></div>
+  <div class="bn am"><div class="bn-t">Email — No Deliverability Infra</div><div class="bn-p">No dedicated sending infrastructure, no warm-up. Risk of spam before it's read.</div><div class="bn-f">→ Cloudflare domains + Instantly · Day 1</div></div>
+</div>
+
+<!-- 08 ASSUMPTIONS -->
+<div class="sec-head"><span class="sec-num">08</span><h2>Assumptions &amp; Open Questions</h2></div>
+<div class="panel-grid g3">
+  <div class="panel">
+    <div class="posture-t">Assumptions Made</div>
+    <ul class="items"><li>Oleg can build N8N workflows + Clay tables in scope</li><li>Current RMS has usable API — verify before System 04</li><li>"Instantly killed" = risk not certainty; infra design mitigates</li><li>Unraid has sufficient uptime reliability</li><li>Emre allocated to outbound ops at £15k/yr</li><li>Lauren has weekly time to approve AI output</li><li>Commonwealth Games proposal has live deadline</li></ul>
+  </div>
+  <div class="panel">
+    <div class="posture-t">Open Questions</div>
+    <ul class="items"><li>Current monthly outbound volume — emails + LinkedIn?</li><li>Does Current RMS have an API or manual-only today?</li><li>Contabo VPS spec + is N8N already running?</li><li>Who is Jacko + what is the Unraid server spec?</li><li>Is GHL fully set up with pipeline stages?</li><li>Is Rank Math installed + configured on WordPress?</li><li>Monthly budget for tools + contractor time?</li><li>Revenue target 2025/2026 vs current trajectory?</li></ul>
+  </div>
+  <div class="panel">
+    <div class="posture-t">Resilience &amp; Fallbacks</div>
+    <ul class="items"><li>Instantly → Hypergen.io / QuickMail if deliverability degrades</li><li>Clay → Apollo.io if pricing changes</li><li>Krystal → Contabo / Coolify for web hosting</li><li>Human checkpoints prevent AI errors reaching clients</li><li>Phased rollout — Phase 1 failures don't block Phase 2</li><li>No single-tool dependency across any system</li></ul>
+  </div>
+</div>
+
+<div class="cta">
+  <div class="cta-lbl">◈ RECOMMENDED NEXT ACTION — TODAY</div>
+  <p>Register 5 sending domains on Cloudflare and start the Instantly warm-up sequence. Everything in the outbound system depends on this existing first. It takes 2 hours, costs under £50. There is no reason not to do it today.</p>
+  <code>Domains → sonus-events.co.uk · sonusgroup.io · sonus-av.co.uk · sonusproduction.com · sonusevents.io</code>
+  <code style="margin-top:.4rem">Stack → Cloudflare DNS → Google Workspace inboxes → Instantly warm-up → Clay table → N8N webhook</code>
+</div>
+
+</div>
+
+<footer>
+  <span>Sonus Events · AI Operations Strategy · Confidential</span>
+  <span>Hover nodes to explore • Built with Claude • April 2025</span>
+  <span>8 systems · 10 roles · 90-day roadmap</span>
+</footer>
+
+</body>
+</html>
